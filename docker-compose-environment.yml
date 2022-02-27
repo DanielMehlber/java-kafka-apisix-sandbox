@@ -18,6 +18,27 @@
 version: "3"
 
 services:
+
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_USER: spring-boot-user
+      MYSQL_PASSWORD: Password123!?
+      MYSQL_DATABASE: UserDB
+      MYSQL_ROOT_PASSWORD: Password123!?
+    ports:
+      - "3305:3306" # this can be accessed at localhost:3305
+    volumes:
+      - ./src/main/resources/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+    command: --init-file /docker-entrypoint-initdb.d/setup.sql
+    healthcheck:
+      test: [ "CMD", "mysql", "--user=spring-boot-user", "--password=Password123!?", "--execute=SELECT 1" ]
+      interval: 1s
+      timeout: 10s
+      retries: 20
+
+
   apisix-dashboard:
     image: apache/apisix-dashboard:2.10.1-alpine
     restart: always
